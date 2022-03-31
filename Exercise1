@@ -1,0 +1,26 @@
+Mapping reads to a reference genome 
+
+The files for this exeercise are in the cluster, copy the contents of the Training folder to your local scratch area
+
+/n/holylfs05/LABS/hanage_lab/Lab/holyscratch01/madikay/Training/
+In there are two folders:
+raw_reads/
+reference/
+
+## Before we start lets have a look at Staphylococcus aureus reference genomes that are present in the Sanger institute repositories
+https://www.sanger.ac.uk/resources/downloads/bacteria/staphylococcus-aureus.html
+
+For this example we will use the USA300 MRSA genome from texas USA300_TCH1516
+link to reference genome: https://www.ncbi.nlm.nih.gov/nuccore/CP000730.1
+Link to original research article on paper: https://pubmed.ncbi.nlm.nih.gov/17986343/
+
+Step 1: Identify the tool you want to use for mapping
+We will use bwa as a case example, but you can use other methods
+
+Bwa user manual: http://bio-bwa.sourceforge.net/bwa.shtml
+we will go through the specific code for these steps together
+1) Index the reference genome
+2) Optional step: trim the sequenced reads
+3) Map the reads to the reference genome
+4) Figure out how to loop it to do all samples (script or a dirty one-liner)
+
