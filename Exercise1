@@ -24,3 +24,17 @@ we will go through the specific code for these steps together
 3) Map the reads to the reference genome
 4) Figure out how to loop it to do all samples (script or a dirty one-liner)
 
+## Create softl ink to files in your space
+ln -s /n/holylfs05/LABS/hanage_lab/Lab/holyscratch01/madikay/Training/* .
+
+module load bwa
+
+## Example script
+bwa mem -p ../reference/CP000730_USA300_TCH1516.fasta 1133_2P_.R1.fq > 1133_2P_.sam
+
+### Now lets loop through
+1) List all your read files in a text file
+ls | grep fq | xargs -n 2 > reads.list
+
+2) Loop through the text file, extract sample names and run mapping for each one
+while read i; do IFS='.' read -r -a f <<< "$i"; sbatch -p shared  -t 7000 --mem=4000 --wrap="bwa mem ../reference/CP000730_USA300_TCH1516.fasta $i > ../sam/$f.sam"; done < reads.list 
