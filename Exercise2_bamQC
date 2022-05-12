@@ -33,6 +33,7 @@ sbatch -p shared  -t 7000 --mem=4000 --wrap="singularity exec --cleanenv /n/sing
 for i in *.s.bam; do IFS='.' read -r -a f <<< "$i"; sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="bcftools mpileup -Ou -f ../reference/CP000730_USA300_TCH1516.fasta $i | bcftools call -cv -Ov -o ../vcf/$f.raw.snps.vcf"; done
 
 ## Set SNP  Filters 
+
 for i in *raw.snps.vcf; do IFS='.' read -r -a f <<< "$i"; bcftools filter -i 'QUAL>100 && DP>20' $i | bcftools view -m2 -M2 -v snps -Ob -o $f.final.snps.bcf.gz; done
 
 sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="for i in *bcf.gz; do bcftools index $i"; done"
@@ -48,3 +49,8 @@ for i in *consensus.snps.bcf.gz; do sbatch -p serial_requeue  -t 3200 --mem=4000
 cat ../reference/CP000730_USA300_TCH1516.fasta *consensus.fasta > Our_alignment.fasta
 
 ## Extract snps and build tree
+module load snp_sites
+snp-sites -m Our_alignment.fasta -p -o SNP_alignment.phylip
+
+### Build a tree with RaxML
+
