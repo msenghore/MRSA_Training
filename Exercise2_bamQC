@@ -31,3 +31,8 @@ sbatch -p shared  -t 7000 --mem=4000 --wrap="singularity exec --cleanenv /n/sing
 ### Copy the multiqc output to your local computer and visaulize on chrome. 
 
 for i in *.s.bam; do IFS='.' read -r -a f <<< "$i"; sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="bcftools mpileup -Ou -f ../reference/CP000730_USA300_TCH1516.fasta $i | bcftools call -cv -Ov -o $f_confirmed_snps.vcf"; done
+
+## Set SNP  Filters 
+
+for i in *confirmed_snps.vcf; do IFS='.' read -r -a f <<< "$i"; bcftools filter -i 'AD[0]/DP < 0.2  && QUAL>100 && DP>20' $i > $f.q100.DP20.snps.vcf"
+
