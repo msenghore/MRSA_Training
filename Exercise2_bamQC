@@ -33,10 +33,13 @@ sbatch -p shared  -t 7000 --mem=4000 --wrap="singularity exec --cleanenv /n/sing
 for i in *.s.bam; do IFS='.' read -r -a f <<< "$i"; sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="bcftools mpileup -Ou -f ../reference/CP000730_USA300_TCH1516.fasta $i | bcftools call -cv -Ov -o ../vcf/$f.raw.snps.vcf"; done
 
 ## Set SNP  Filters 
-for i in *raw.snps.vcf; do IFS='.' read -r -a f <<< "$i"; sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="bcftools filter -i 'AD[0]/DP < 0.2  && QUAL>100 && DP>20' $i | bcftools view -m2 -M2 -v snps -Ob -o $f.final.snps.bcf.gz"; done
+for i in *raw.snps.vcf; do IFS='.' read -r -a f <<< "$i"; bcftools filter -i 'QUAL>100 && DP>20' $i | bcftools view -m2 -M2 -v snps -Ob -o $f.final.snps.bcf.gz; done
 
 sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="for i in *bcf.gz; do bcftools index $i"; done"
 
+## Only keep snps where the ALT allele is more than 80% frequency
+for i in *final.snps.bcf.gz; do  IFS='.' read -r -a f <<< "$i"; bcftools filter -i 'AF1 > 0.8' $i | bcftools view -Ob > $f.consensus.snps.bcf.gz; done
+
 ## Build a consensus genome
 mkdir ../consensus
-for i in *bcf.gz; do sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="cat ../reference/CP000730_USA300_TCH1516.fasta | bcftools consensus $f.final.snps.bcf.gz > ../consensus/$f.consensus.fasta"
+for i in *consensus.snps.bcf.gz; do sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="cat ../reference/CP000730_USA300_TCH1516.fasta | bcftools consensus $f.final.snps.bcf.gz > ../consensus/$f.consensus.fasta"
