@@ -43,3 +43,8 @@ for i in *final.snps.bcf.gz; do  IFS='.' read -r -a f <<< "$i"; bcftools filter 
 ## Build a consensus genome
 mkdir ../consensus
 for i in *consensus.snps.bcf.gz; do sbatch -p serial_requeue  -t 3200 --mem=4000 --wrap="cat ../reference/CP000730_USA300_TCH1516.fasta | bcftools consensus $f.final.snps.bcf.gz > ../consensus/$f.consensus.fasta"
+
+## Build an alignment
+cat ../reference/CP000730_USA300_TCH1516.fasta *consensus.fasta > Our_alignment.fasta
+
+## Extract snps and build tree
